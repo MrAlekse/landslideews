@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landslide EWS Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Background overlay -->
+    <div class="background-overlay"></div>
+    
+    <!-- Header with hamburger menu -->
+    <nav>
+        <div class="logo">
+            <i class="fas fa-mountain"></i> Landslide EWS
+        </div>
+        <div class="nav-right">
+            <div class="status-indicator">
+                System Status: <span id="system-status">Live</span>
+            </div>
+            <button class="menu-button" id="menuButton">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h2>Menu</h2>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="menu-content">
+            <!-- Risk Levels Tab -->
+            <div class="menu-tab active" data-tab="risk-levels">
+                <i class="fas fa-exclamation-triangle"></i> Risk Levels
+            </div>
+            <div class="menu-tab" data-tab="calendar">
+                <i class="fas fa-calendar-alt"></i> Calendar
+            </div>
+        </div>
+
+        <!-- Risk Levels Content -->
+        <div class="tab-content active" id="risk-levels-content">
+            <h3>Landslide Risk Levels</h3>
+            
+            <div class="risk-level risk-green">
+                <div class="risk-header">
+                    <span class="risk-label">GREEN</span>
+                    <span class="risk-badge">Level 0</span>
+                </div>
+                <div class="risk-description">
+                    <strong>Low Risk</strong>
+                    <p>Normal conditions</p>
+                </div>
+                <div class="risk-action">
+                    <i class="fas fa-check-circle"></i>
+                    No action required
+                </div>
+            </div>
+
+            <div class="risk-level risk-yellow">
+                <div class="risk-header">
+                    <span class="risk-label">YELLOW</span>
+                    <span class="risk-badge">Level 1</span>
+                </div>
+                <div class="risk-description">
+                    <strong>Moderate Risk</strong>
+                    <p>Elevated soil moisture or rainfall</p>
+                </div>
+                <div class="risk-action">
+                    <i class="fas fa-eye"></i>
+                    Increase monitoring
+                </div>
+            </div>
+
+            <div class="risk-level risk-orange">
+                <div class="risk-header">
+                    <span class="risk-label">ORANGE</span>
+                    <span class="risk-badge">Level 2</span>
+                </div>
+                <div class="risk-description">
+                    <strong>High Risk</strong>
+                    <p>Critical conditions detected</p>
+                </div>
+                <div class="risk-action">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Prepare to evacuate
+                </div>
+            </div>
+
+            <div class="risk-level risk-red">
+                <div class="risk-header">
+                    <span class="risk-label">RED</span>
+                    <span class="risk-badge">Level 3</span>
+                </div>
+                <div class="risk-description">
+                    <strong>Very High Risk</strong>
+                    <p>Imminent landslide danger</p>
+                </div>
+                <div class="risk-action">
+                    <i class="fas fa-running"></i>
+                    Evacuate immediately
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Content -->
+        <div class="tab-content" id="calendar-content">
+            <h3>Historical Data</h3>
+            
+            <div class="calendar-picker">
+                <label>Select Date:</label>
+                <input type="date" id="datePicker" class="date-input">
+                <button class="load-data-btn" id="loadHistoricalData">
+                    <i class="fas fa-search"></i> Load Data
+                </button>
+            </div>
+
+            <div class="historical-summary" id="historicalSummary">
+                <p class="no-data">Select a date to view historical data</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="alert-banner" id="alert-banner">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Alert Level: <span id="alert-text">Level 1 (Normal)</span>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="card glass-card">
+                <i class="fas fa-tint icon"></i>
+                <h3>Soil Moisture</h3>
+                <p class="value" id="soil-value">-- %</p>
+            </div>
+            <div class="card glass-card">
+                <i class="fas fa-cloud-showers-heavy icon"></i>
+                <h3>Rain Intensity</h3>
+                <p class="value" id="rain-value">-- mm</p>
+            </div>
+            <div class="card glass-card">
+                <i class="fas fa-compass icon"></i>
+                <h3>Tilt Angle</h3>
+                <p class="value" id="tilt-value">--°</p>
+            </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="chart-container glass-container">
+            <div class="chart-header">
+                <h2 class="chart-title">
+                    <i class="fas fa-chart-line"></i> Sensor Data Trends
+                </h2>
+                <div class="chart-datetime">
+                    <p class="chart-date" id="current-date">-- -- ----</p>
+                    <p class="chart-time" id="current-time">--:--:-- --</p>
+                </div>
+            </div>
+            <canvas id="sensorChart"></canvas>
+        </div>
+
+        <!-- Emergency Contacts -->
+        <div class="emergency-contacts glass-container">
+            <div class="emergency-header">
+                <i class="fas fa-phone-alt"></i>
+                <h2>Emergency Hotline Numbers</h2>
+            </div>
+            <div class="contacts-grid">
+                <!-- Response & Disaster -->
+                <div class="contact-category">
+                    <h3><i class="fas fa-shield-alt"></i> Response & Disaster</h3>
+                    <div class="contact-item">
+                        <span class="contact-name">CDRRMO</span>
+                        <a href="tel:09171779215" class="contact-number">0917 1779 215</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">BFP Calbayog</span>
+                        <a href="tel:09271279488" class="contact-number">0927 1279 488</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">CAPOSO</span>
+                        <a href="tel:09355892166" class="contact-number">0935 5892 166</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">CAAP Calbayog</span>
+                        <a href="tel:09279135412" class="contact-number">0927 9135 412</a>
+                    </div>
+                </div>
+
+                <!-- Police -->
+                <div class="contact-category">
+                    <h3><i class="fas fa-user-shield"></i> Police</h3>
+                    <div class="contact-item">
+                        <span class="contact-name">PNP Calbayog</span>
+                        <a href="tel:09054254511" class="contact-number">0905 4254 511</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">PNP Palanas Cara</span>
+                        <a href="tel:09564460025" class="contact-number">0956 4460 025</a>
+                    </div>
+                </div>
+
+                <!-- Utilities -->
+                <div class="contact-category">
+                    <h3><i class="fas fa-bolt"></i> Utilities</h3>
+                    <div class="contact-item">
+                        <span class="contact-name">SAMELCO I (Carayman)</span>
+                        <a href="tel:09173102881" class="contact-number">0917 3102 881</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">SAMELCO I (Capoocan)</span>
+                        <a href="tel:09561568272" class="contact-number">0956 1568 272</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">Calbayog Water District</span>
+                        <a href="tel:0552091566" class="contact-number">(055) 209 1566</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">Calbayog Water Company Inc.</span>
+                        <a href="tel:09178188577" class="contact-number">0917 8188 577</a>
+                    </div>
+                </div>
+
+                <!-- Medical -->
+                <div class="contact-category">
+                    <h3><i class="fas fa-hospital"></i> Medical</h3>
+                    <div class="contact-item">
+                        <span class="contact-name">Adventist Hospital</span>
+                        <a href="tel:09165112423" class="contact-number">0916 5112 423</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">St. Camillus Hospital</span>
+                        <a href="tel:09178889986" class="contact-number">0917 8889 986</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">West Samar Doctors Hospital</span>
+                        <a href="tel:09176868006" class="contact-number">0917 6868 006</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-name">Calbayog District Hospital</span>
+                        <a href="tel:0552091566" class="contact-number">(055) 209 1566</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

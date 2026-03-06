@@ -46,6 +46,7 @@ main {
 
 nav {
     background: rgba(44, 62, 80, 0.95);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: white;
     padding: 1rem 2rem;
@@ -98,6 +99,7 @@ nav {
     width: 400px;
     height: 100vh;
     background: rgba(44, 62, 80, 0.98);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
     transition: right 0.3s ease;
@@ -361,6 +363,7 @@ main {
 .glass-card {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -395,6 +398,7 @@ main {
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }

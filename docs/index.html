@@ -23,7 +23,7 @@
             <div class="status-indicator">
                 System Status: <span id="system-status">Live</span>
             </div>
-            <button class="menu-button" id="menuButton">
+            <button type="button" class="menu-button" id="menuButton" title="Open navigation menu">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -33,7 +33,7 @@
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <h2>Menu</h2>
-            <button class="close-menu" id="closeMenu">
+            <button type="button" class="close-menu" id="closeMenu" title="Close navigation menu">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -118,8 +118,8 @@
             <h3>Historical Data</h3>
             
             <div class="calendar-picker">
-                <label>Select Date:</label>
-                <input type="date" id="datePicker" class="date-input">
+                <label for="datePicker">Select Date:</label>
+                <input type="date" id="datePicker" class="date-input" title="Select a date to view historical data">
                 <button class="load-data-btn" id="loadHistoricalData">
                     <i class="fas fa-search"></i> Load Data
                 </button>
